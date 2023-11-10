@@ -1,5 +1,4 @@
 import { ChromePicker } from "react-color";
-import "./App.css";
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { drawLine } from "./utils/drawLine";
@@ -49,14 +48,21 @@ function App() {
   }
 
   return (
-    <div className="flex flex-col">
-      <div className="">
+    <div className="flex sm:flex-col md:flex-row bg-gray-100 bg-repeat-10 justify-center items-center gap-5 min-h-screen min-w-screen">
+      <canvas className="border bg-white border-black" ref={canvasRef} onMouseDown={onMouseDown} width={800} height={600} />
+      <div className="flex flex-col items-center gap-10 sm:gap-5">
+        <div className="flex text-gray-600">
+          <svg viewBox="0 0 64 64" fill="currentColor" height="2em" width="2em">
+            <path fill="none" stroke="currentColor" strokeMiterlimit={10} strokeWidth={2} d="M30 42l-4 4-8-8 4-4L62 1l1 1zM22 34l8 8" />
+            <path fill="none" stroke="currentColor" strokeMiterlimit={10} strokeWidth={2} d="M26 46S18 63 1 63c0 0 2.752-16.314 9-21 4-3 8-4 8-4" />
+          </svg>
+          <h1 className="text-3xl -ml-3">canvasColab</h1>
+        </div>
         <ChromePicker color={color} onChange={(e) => setColour(e.hex)} />
+        <button onClick={() => socket.emit("clear")} className="bg-white rounded-md p-3 border border-gray-700">
+          Clear
+        </button>
       </div>
-      <button onClick={() => socket.emit("clear")} className="">
-        Clear
-      </button>
-      <canvas ref={canvasRef} onMouseDown={onMouseDown} width={768} height={768} className="border border-black" />
     </div>
   );
 }
