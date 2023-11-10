@@ -1,12 +1,14 @@
 import { ChromePicker } from "react-color";
 import "./App.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { drawLine } from "./utils/drawLine";
+import { useDraw } from "./hooks/useDraw";
 const socket = io("http://localhost:3001");
 
 function App() {
   const [color, setColour] = useState("#955");
+  const { canvasRef, onMouseDown, clear } = useDraw(createLine);
 
   function createLine({ prevPoint, currentPoint, context }) {
     socket.emit("draw-line", { prevPoint, currentPoint, color });
@@ -14,9 +16,14 @@ function App() {
   }
 
   return (
-    <div>
-      <h1 className="text-3xl bg-blue-500 font-bold underline">Hello world!</h1>
-      <ChromePicker color={colour} onChange={(e) => setColour(e.hex)} />
+    <div className="flex flex-col">
+      <div className="">
+        <ChromePicker color={color} onChange={(e) => setColour(e.hex)} />
+      </div>
+      <button onClick={clear} className="">
+        Clear
+      </button>
+      <canvas ref={canvasRef} onMouseDown={onMouseDown} width={768} height={768} className="border border-black" />
     </div>
   );
 }
