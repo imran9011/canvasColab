@@ -12,11 +12,35 @@ function App() {
 
   useEffect(() => {
     const context = canvasRef.current?.getContext("2d");
+
+    socket.emit("client-ready");
+
+    socket.on("get-canvas-state", () => {
+      if (!canvasRef.current?.toDataURL()) return;
+      socket.emit("canvas-state", canvasRef.current.toDataURL());
+    });
+
+    socket.on("canvas-state-from-server", (state) => {
+      const img = new Image();
+      img.src = state;
+      img.onload = function () {
+        context.drawImage(img, 0, 0);
+      };
+    });
+
     socket.on("draw-line", ({ prevPoint, currentPoint, color }) => {
       if (!context) return;
       drawLine({ prevPoint, currentPoint, context, color });
     });
+
     socket.on("clear", clear);
+
+    return () => {
+      socket.off("get-canvas-state");
+      socket.off("canvas-state-from-server");
+      socket.off("draw-line");
+      socket.off("clear");
+    };
   }, [canvasRef]);
 
   function createLine({ prevPoint, currentPoint, context }) {
